@@ -1,9 +1,21 @@
 import reactProps from './react-props'
 import htmlAttributes from 'react-html-attributes'
 
-import { propOr, contains, pickBy, curry } from 'ramda'
+import {
+  propOr,
+  contains,
+  pickBy,
+  curry,
+  startsWith,
+  anyPass,
+  map,
+  pipe
+} from 'ramda'
 import memoize from 'fast-memoize'
 const globalHtmlProps = htmlAttributes['*']
+
+const startsWithAny = (...searchStrs) =>
+  pipe(map(startsWith), anyPass)(searchStrs)
 
 // Mostly from the Shades library: https://github.com/bupa-digital/shades/
 
@@ -16,7 +28,8 @@ const isReactProp = propName => reactProps.includes(propName)
 const shouldForwardProp_ = (tagName, propName) =>
   typeof tagName !== 'string' ||
   isReactProp(propName) ||
-  isHtmlProp(tagName, propName)
+  isHtmlProp(tagName, propName) ||
+  startsWithAny('aria-', 'data-')
 
 export const shouldForwardProp = memoize(shouldForwardProp_)
 
