@@ -1,38 +1,41 @@
-import reactProps from './react-props'
-import htmlAttributes from 'react-html-attributes'
+// import {
+//   propOr,
+//   contains,
+//   curryN,
+//   startsWith,
+//   anyPass,
+//   pipe,
+//   mapValues,
+//   filter,
+// } from '@roseys/futils/es'
+import propOr from '@roseys/futils/es/propOr'
+import contains from '@roseys/futils/es/contains'
+import curryN from '@roseys/futils/es/curryN'
+import startsWith from '@roseys/futils/es/startsWith'
+import anyPass from '@roseys/futils/es/anyPass'
+import pipe from '@roseys/futils/es/pipe'
+import mapValues from '@roseys/futils/es/mapValues'
+import filter from '@roseys/futils/es/filter'
 
-import {
-  propOr,
-  contains,
-  pickBy,
-  curry,
-  startsWith,
-  anyPass,
-  map,
-  pipe
-} from 'ramda'
 import memoize from 'fast-memoize'
-const globalHtmlProps = htmlAttributes['*']
+import Attrs from './attributesByTag'
 
-const startsWithAny = (...searchStrs) =>
-  pipe(map(startsWith), anyPass)(searchStrs)
+export const startsWithAny = (...searchStrs) =>
+  pipe(
+    mapValues(startsWith),
+    anyPass,
+  )(searchStrs)
 
-// Mostly from the Shades library: https://github.com/bupa-digital/shades/
+export const isHtmlProp = (tagName, propName) =>
+  contains(propName, propOr([], tagName, Attrs))
 
-const isHtmlProp = (tagName, propName) =>
-  contains(propName, globalHtmlProps) ||
-  contains(propName, propOr({}, tagName, htmlAttributes))
-
-const isReactProp = propName => reactProps.includes(propName)
-
-const shouldForwardProp_ = (tagName, propName) =>
+export const shouldForwardProp_ = (tagName, propName) =>
   typeof tagName !== 'string' ||
-  isReactProp(propName) ||
   isHtmlProp(tagName, propName) ||
-  startsWithAny('aria-', 'data-')
+  startsWithAny('aria-', 'data-')(propName)
 
 export const shouldForwardProp = memoize(shouldForwardProp_)
 
-export default curry((tagName, props) =>
-  pickBy((val, key) => shouldForwardProp(tagName, key))(props)
+export const cleanPropsbyTag= curryN(2, (tagName, props) =>
+  filter((val, key) => shouldForwardProp(tagName, key))(props),
 )
