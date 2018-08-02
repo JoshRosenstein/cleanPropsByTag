@@ -1,12 +1,12 @@
 {
-  "extends": "react-tools",
+  "extends": ["react-tools"],
   "globals":{
     "expect":true,
     "describe":true,
     "test":true,
     "it":true,
     "jest":true
-  },
+  },  
   "rules":{
     "quotes": ["warn", "single", { "avoidEscape": true }],
     "linebreak-style":0,

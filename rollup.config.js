@@ -1,61 +1,53 @@
 
 import babel from 'rollup-plugin-babel'
-import {uglify} from 'rollup-plugin-uglify'
+import cleanup from 'rollup-plugin-cleanup'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import replace from 'rollup-plugin-replace'
 import filesize from 'rollup-plugin-filesize'
 import { terser } from 'rollup-plugin-terser'
 
 import pkg from './package.json'
 
-const plugins = [
-  resolve(),
-  commonjs(),
 
-  babel({
-    babelrc: false,
-    presets: [
-      [
-        'env',
-        {
-          'targets': {
-            'browsers': [
-              'last 2 versions',
-              'ie >= 9'
-            ]
-          },
-          'modules': false
-        }
-      ],
-      'stage-0'
-    ],
-    'plugins': ['external-helpers'],
-    runtimeHelpers: true
-  }),
-  terser(),
-  filesize()
+const deafultBabel=(additions = {}) => ({
+  exclude: 'node_modules/**',
+  babelrc: false,
+  presets: [['env', { loose: true, modules: false }], 'react', 'stage-0'],
+  plugins: ['external-helpers'],
+  ...additions
+})
+
+const treeshake={pureExternalModules:true,
+}
+
+const outputs = [
+  {external:[  ...Object.keys(pkg.peerDependencies || {})],
+    format: 'umd',
+    name: 'cleanPropsbyTag',
+    file: pkg.browser,
+    plugins: [resolve(),commonjs(),terser()],
+
+  },
+  {
+    format: 'cjs',
+    interop:false,
+    plugins: [cleanup()],
+    file: 'dist/index.min.js',
+  },
+  {
+    format: 'es',
+    interop:false,
+    plugins: [cleanup()],
+    file: 'dist/index.es.js',
+  }
 ]
 
-const configBase = {
-  input: 'src/index.js',
-  treeshake: true,
-  output: [
-    { file: pkg.module, format: 'es', sourcemap: true },
-    { file: pkg.main, format: 'cjs', sourcemap: true },
-  ],
-  plugins,
-}
 
-const UMDBase = {
-  input: 'src/index.js',
-  treeshake: true,
-  output: [
-    { file: pkg.browser, format: 'umd', name: pkg.moduleName },
-  ],
-
-  plugins:[...plugins,uglify()]
-
-}
-
-export default [configBase,UMDBase]
+export default outputs.map(({ fileExt,external=['@roseys/futils'] ,plugins = [],babelc={},...output }) => ({
+  input: 'temp/index.js',
+  output,
+  treeshake,
+  external,
+  plugins: [
+    babel(deafultBabel(babelc)), ...plugins, filesize()]
+}))

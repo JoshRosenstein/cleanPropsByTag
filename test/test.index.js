@@ -1,16 +1,10 @@
-import { cleanPropsbyTag, startsWithAny, isHtmlProp } from '../src/'
+import { cleanPropsbyTag, shouldForwardProp} from '../src/'
 
-describe('startsWithAny', () => {
-  test('works', () => {
-    expect(startsWithAny('a', 'b', 'c')('ab')).toBeTruthy()
-    expect(startsWithAny('a', 'b', 'c')('dc')).toBeFalsy()
-  })
-})
 
 describe('isHtmlProp', () => {
   test('works', () => {
-    expect(isHtmlProp('button', 'disabled')).toBeTruthy()
-    expect(isHtmlProp('button', 'primary')).toBeFalsy()
+    expect(shouldForwardProp('button', 'disabled')).toBeTruthy()
+    expect(shouldForwardProp('button', 'primary')).toBeFalsy()
   })
 })
 
@@ -33,3 +27,4 @@ describe('cleanPropsbyTag', () => {
     )
   })
 })
+ 

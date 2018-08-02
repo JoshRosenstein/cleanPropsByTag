@@ -1,99 +1,18 @@
 {
-  "presets":[
-    [
-      "env",
-      {
-        "targets":{
-          "browsers":[
-            "Firefox ESR"
-          ]
-        },
-        "modules":false,
-        "loose":false
-      }
-    ],
-    "react",
-    "stage-0"
-  ],
-  "plugins":[
-
-  ],
-  "env":{
-    "test":{
-      "presets":[
-        [
-          "env"
-        ],
-        "react",
-        "stage-0"
-      ],
-      "plugins":[
+  "env": {
+    "test": {
+      "presets": ["env", "react", "stage-0"],
+      "plugins": [
         "transform-runtime"
       ]
     },
-    "es":{
-      "presets":[
-        [
-          "env",
-          {
-            "targets":{
-              "browsers":[
-                "last 1 safari version",
-                "last 1 Chrome versions"
-              ]
-            },
-            "modules":false
+    "transform": {
+      "plugins": [
+        ["transform-imports", {
+          "@roseys/futils": {
+            "transform": "@roseys/futils/es/${member}"
           }
-        ]
-      ],
-      "compact":false,
-      "comments":true,
-      "plugins":[
-        "annotate-pure-calls"
-      ]
-    },
-    "cjs":{
-      "presets":[[
-                    "env",
-                    {
-                        "targets": { "browsers": [
-                          "last 1 safari version",
-                          "last 1 Chrome versions"] },
-
-                    },
-                ],
-        ["react"]
-      ],
-      "compact":false,
-      "comments":false,
-      "plugins":[
-        "annotate-pure-calls"
-      ]
-    },
-    "temp":{
-      "presets":[],
-      "compact":false,
-      "comments":false,
-      "plugins":["transform-name-export-default"]
-    },
-    "raw":{
-      "presets":[
-        [
-          "env",
-          {
-            "targets":{
-              "browsers":[
-                "last 2 versions",
-                "ie >= 9"
-              ]
-            }
-          }
-        ],
-        "react",
-        "stage-0"
-      ],
-      "plugins":[
-        "transform-runtime"
+        }]
       ]
     }
   }
