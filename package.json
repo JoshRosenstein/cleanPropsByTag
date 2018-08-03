@@ -2,13 +2,13 @@
   "name": "@roseys/clean-props-by-tag",
   "author": "Josh Rosenstein",
   "license": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [],
-  "main": "dist/index.cjs.js",
+  "main": "dist/index.js",
   "module": "dist/index.es.js",
-  "browser": "dist/index.umd.min.js",
-  "unpkg": "dist/index.umd.min.js",
-  "jsdelivr": "dist/index.umd.min.js",
+  "browser": "dist/cleanPropsbyTag.min.js",
+  "unpkg": "dist/cleanPropsbyTag.min.js",
+  "jsdelivr": "dist/cleanPropsbyTag.min.js",
   "files": [
     "dist",
     "src",
@@ -63,9 +63,11 @@
     "collectCoverage": true,
     "coverageDirectory": "./coverage/"
   },
-  "bundlesize": [{
-    "path": "dist/futils.min.js"
-  }],
+  "bundlesize": [
+    {
+      "path": "dist/cleanPropsbyTag.min.js"
+    }
+  ],
   "lint-staged": {
     "*.js": [
       "prettier --no-semi --single-quote --write",
