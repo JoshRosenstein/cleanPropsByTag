@@ -8,46 +8,65 @@ import { terser } from 'rollup-plugin-terser'
 
 import pkg from './package.json'
 
-
-const deafultBabel=(additions = {}) => ({
+const external = Object.keys(pkg.dependencies)
+const plugins=[  babel({
   exclude: 'node_modules/**',
   babelrc: false,
   presets: [['env', { loose: true, modules: false }], 'react', 'stage-0'],
   plugins: ['external-helpers'],
-  ...additions
-})
+})]
+
+const pluginslib=[  babel({
+  plugins:[['transform-imports', {
+    '@roseys/futils': {
+      'transform': '@roseys/futils/lib/${member}'
+    }
+  }]]
+})]
+
+const pluginsES=[  babel({
+  plugins:[['transform-imports', {
+    '@roseys/futils': {
+      'transform': '@roseys/futils/es/${member}'
+    }
+  }]]
+})]
+
 
 const treeshake={pureExternalModules:true,
 }
 
-const outputs = [
-  {external:[  ...Object.keys(pkg.peerDependencies || {})],
-    format: 'umd',
-    name: 'cleanPropsbyTag',
-    file: pkg.browser,
-    plugins: [resolve(),commonjs(),terser()],
-
-  },
-  {
-    format: 'cjs',
-    interop:false,
-    plugins: [cleanup()],
-    file: 'dist/index.min.js',
-  },
-  {
-    format: 'es',
-    interop:false,
-    plugins: [cleanup()],
-    file: 'dist/index.es.js',
-  }
-]
-
-
-export default outputs.map(({ fileExt,external=['@roseys/futils'] ,plugins = [],babelc={},...output }) => ({
+const umdConfig={
   input: 'temp/index.js',
-  output,
+  treeshake,
+  output: [
+    { file: pkg.browser, format: 'umd', name: 'name', sourcemap: false ,exports:'named'}
+  ],
+  plugins:[ resolve(),commonjs(),...plugins,terser(),filesize()]
+}
+
+const mainConfig = {
+  input: 'src/index.js',
   treeshake,
   external,
-  plugins: [
-    babel(deafultBabel(babelc)), ...plugins, filesize()]
-}))
+  output: [
+    { file: pkg.main, format: 'cjs',  exports:'named',interop:false },
+
+
+  ],
+  plugins:[...plugins,...pluginslib,cleanup(),filesize()]
+}
+
+const esConfig = {
+  input: 'src/index.js',
+  treeshake,
+  external,
+  output: [
+
+    { file: pkg.module, format: 'es', exports:'named'  },
+  ],
+  plugins:[...plugins,...pluginsES,cleanup(),filesize()]
+}
+
+
+export default [umdConfig,mainConfig,esConfig]
